@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"log"
 	"os"
 )
@@ -12,10 +11,11 @@ type item struct {
 	size         string
 	label        string
 	availability string
+	color        string
 }
 
 func main() {
-	items := map[string]item{}
+	items := make(map[string]item)
 	file1, err := os.Open("./fileSet1/file1.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -23,13 +23,15 @@ func main() {
 	defer file1.Close()
 
 	csvReader := csv.NewReader(file1)
-	data, err := csvReader.ReadAll()
+	records, err := csvReader.ReadAll()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for i := 1; i < len(data); i++ {
-		itemData := item{id: data[i][0], size: data[i][1], label: data[i][2]}
+	file1.Close()
+
+	for i := 1; i < len(records); i++ {
+		itemData := item{id: records[i][0], size: records[i][1], label: records[i][2]}
 		items[itemData.id] = itemData
 	}
 
@@ -40,16 +42,18 @@ func main() {
 	defer file2.Close()
 
 	csvReader = csv.NewReader(file2)
-	data, err = csvReader.ReadAll()
+	records, err = csvReader.ReadAll()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	for i := 1; i < len(data); i++ {
-		itemData := item{id: data[i][0], availability: data[i][1]}
+	file2.Close()
+
+	for i := 1; i < len(records); i++ {
+		itemData := item{id: records[i][0], availability: records[i][1]}
 		if val, ok := items[itemData.id]; ok {
-			fmt.Println(val)
 			val.availability = itemData.availability
+			items[itemData.id] = val
 		} else {
 			items[itemData.id] = itemData
 		}
@@ -64,12 +68,47 @@ func main() {
 	//just amended it by adding availability.
 	//items[testItem.id] = testItem
 
-	csvfile, err := os.Create("MergedCSV.csv")
+	file3, err := os.Open("./fileSet1/file3.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file3.Close()
+
+	csvReader = csv.NewReader(file3)
+	records, err = csvReader.ReadAll()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	csvwriter := csv.NewWriter(csvfile)
+	file3.Close()
+
+	for i := 1; i < len(records); i++ {
+		itemData := item{id: records[i][0], color: records[i][1]}
+		if val, ok := items[itemData.id]; ok {
+			val.color = itemData.color
+			items[itemData.id] = val
+		} else {
+			items[itemData.id] = itemData
+		}
+	}
+
+	csvFile, err := os.Create("MergedCSV.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	csvWriter := csv.NewWriter(csvFile)
+
+	var data [][]string
+	data = append(data, []string{"id", "size", "label", "availability", "color"})
+	for _, itemRecord := range items {
+		row := []string{itemRecord.id, itemRecord.size, itemRecord.label, itemRecord.availability, itemRecord.color}
+		data = append(data, row)
+	}
+	err = csvWriter.WriteAll(data)
+	if err != nil {
+		log.Fatal("Unable to write to CSV due to following error: ", err)
+	}
 
 	//fmt.Println(len(items))
 
