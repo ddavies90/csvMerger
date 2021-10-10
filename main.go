@@ -59,15 +59,6 @@ func main() {
 		}
 	}
 
-	//set testItem to the result of searching the map for the value passed in to the [] which is a unique ID - should
-	//return a single record. Append availability property on to this record.
-	//testItem := items["fff94c24-2700-4332-af22-f423091100a9"]
-	//testItem.availability = "Available"
-
-	//Search items map to find the record that has the ID that testItem has and set it to the updated testItem, as we
-	//just amended it by adding availability.
-	//items[testItem.id] = testItem
-
 	file3, err := os.Open("./fileSet1/file3.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -109,7 +100,4 @@ func main() {
 	if err != nil {
 		log.Fatal("Unable to write to CSV due to following error: ", err)
 	}
-
-	//fmt.Println(len(items))
-
 }
