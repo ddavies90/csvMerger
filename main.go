@@ -16,6 +16,7 @@ type item struct {
 
 func main() {
 	items := make(map[string]item)
+
 	file1, err := os.Open("./fileSet1/file1.csv")
 	if err != nil {
 		log.Fatal(err)
